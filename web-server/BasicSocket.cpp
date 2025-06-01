@@ -26,7 +26,7 @@ void WBS::BasicSocket::test_connection(int item_to_test) {
 	}
 }
 
-// Getter Functions
+// Getter Function 
 
 struct sockaddr_in WBS::BasicSocket::get_address(){
 	return address;

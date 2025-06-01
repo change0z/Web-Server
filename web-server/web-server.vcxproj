@@ -127,7 +127,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BasicSocket.cpp" />
+    <ClCompile Include="BindingSocket.cpp" />
     <ClCompile Include="web-server.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BasicSocket.hpp" />
+    <ClInclude Include="BindinSocket.hpp" />
+    <ClInclude Include="hdws.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
