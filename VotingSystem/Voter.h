@@ -7,7 +7,7 @@ class Voter {
         std::string getName() const;
         int getID() const;
 
-    private::
+    private:
         std::string name;
         int id;
 };
