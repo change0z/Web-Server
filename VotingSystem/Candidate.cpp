@@ -7,9 +7,9 @@ std::string Candidate::getName() const {
 }
 
 void Candidate::addVote() {
-    vote++;
+    votes++;
 }
 
-int Candidate::getVotes() { 
+int Candidate::getVotes() const {
     return votes;
 }

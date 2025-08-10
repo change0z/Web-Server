@@ -11,8 +11,8 @@ class Election {
         void addCandidate(const std::string& name);
         void registerVoter(const std::string& name, int id);
         void castVote(int voterId, int candidateIndex);
-        void displayResult() const;
-        void savResultsToFile(const std::string& filename) const;
+        void displayResults() const;
+        void saveResultsToFile(const std::string& filename) const;
 
 
     private:
