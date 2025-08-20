@@ -10,8 +10,8 @@ class Candidate {
         
         std::string getName() const;
         std::shared_ptr<Party> getParty() const;
-        void addVote();
-        int getVotes() const;
+        void receiveVote();
+        int getVoteCount() const;
 
     private:
         std::string name;

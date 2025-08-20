@@ -12,10 +12,10 @@ std::shared_ptr<Party> Candidate::getParty() const {
     return party;
 }
 
-void Candidate::addVote() {
+void Candidate::receiveVote() {
     votes++;
 }
 
-int Candidate::getVotes() const {
+int Candidate::getVoteCount() const {
     return votes;
 }
