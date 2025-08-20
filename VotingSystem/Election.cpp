@@ -8,6 +8,16 @@ void Election::addCandidate(const std::string& name) {
     candidates.push_back(std::make_unique<Candidate>(name));
 }
 
+void Election::addCandidate(const std::string& name, std::shared_ptr<Party> party) {
+    candidates.push_back(std::make_unique<Candidate>(name, party));
+}
+
+std::shared_ptr<Party> Election::createParty(const std::string& partyName) {
+    auto party = std::make_shared<Party>(partyName);
+    parties.push_back(party);
+    return party;
+}
+
 void Election::registerVoter(const std::string& name, int id) {
     voters.push_back(std::make_unique<Voter>(name,id));
 }
@@ -24,7 +34,11 @@ void Election::castVote(int voterID, int candidateIndex) {
 void Election::displayResults() const {
     std::cout << "\nElection Results for: " << title << "\n";
     for (const auto& c : candidates) {
-        std::cout << c->getName() << ": " << c->getVotes() << " votes\n";
+        std::cout << c->getName();
+        if (c->getParty()) {
+            std::cout << " (" << c->getParty()->getName() << ")";
+        }
+        std::cout << ": " << c->getVotes() << " votes\n";
     }
 }
 
@@ -36,6 +50,10 @@ void Election::saveResultsToFile(const std::string& filename) const {
     }
     file << "Election Results for: " << title << "\n";
     for (const auto& c : candidates) {
-        file << c->getName() << ": " << c->getVotes() << " votes\n";
+        file << c->getName();
+        if (c->getParty()) {
+            file << " (" << c->getParty()->getName() << ")";
+        }
+        file << ": " << c->getVotes() << " votes\n";
     }
 }

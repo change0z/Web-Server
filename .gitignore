@@ -4,3 +4,125 @@
 
 /web-server/.vs/web-server
 /.vscode
+
+# Build directories
+build/
+Build/
+BUILD/
+debug/
+Debug/
+release/
+Release/
+out/
+bin/
+lib/
+VotingSystem/Debug/
+VotingSystem/Release/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# Executables
+*.exe
+*.out
+*.app
+# VotingSystem executable (but not the directory)
+VotingSystem/VotingSystem
+VotingSystem/VotingSystem.exe
+
+# Object files
+*.o
+*.obj
+*.lo
+*.slo
+*.ko
+*.elf
+
+# Libraries
+*.lib
+*.a
+*.la
+*.so
+*.dll
+*.dylib
+
+# Visual Studio files
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# CLion
+.idea/
+cmake-build-*/
+
+# Qt Creator
+CMakeLists.txt.user*
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Results and output files
+results.txt
+*.output
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Dependencies
+node_modules/
+.npm/
+
+# Package managers
+conan.lock
+vcpkg_installed/
+
+# Clang
+.clangd/
+compile_commands.json
+
+# MinGW
+*.depend
+*.layout
+
+# GCC
+*.gch
+*.pch
+
+# Intel C++ Compiler
+*.dyn
+
+# Fortran module files
+*.mod
+*.smod
