@@ -1,10 +1,10 @@
-# DemocraVote - Fair & Transparent Voting System
+# ClearBallot - Fair & Transparent Voting System
 
 *Empowering democracy through secure, transparent, and accessible voting technology*
 
 ## 🗳️ Core Democratic Principles
 
-**DemocraVote** embodies the fundamental pillars of democratic elections:
+**ClearBallot** embodies the fundamental pillars of democratic elections:
 
 - **🔐 Electoral Integrity**: Secure voter registration with unique ID verification
 - **⚖️ Equal Access**: Fair voting opportunities for all eligible citizens (18+)
@@ -15,7 +15,7 @@
 
 ## 🎯 System Overview
 
-DemocraVote is a comprehensive C++ election management system designed to uphold democratic values through technology. The system separates election administration from voter participation, ensuring fair and secure elections.
+ClearBallot is a comprehensive C++ election management system designed to uphold democratic values through technology. The system separates election administration from voter participation, ensuring fair and secure elections.
 
 ### 🏛️ Administrative Interface (`ElectionAdmin.exe`)
 *For Election Officials & Administrators*
@@ -154,8 +154,8 @@ This project is open source and available under the [LICENSE](LICENSE) file term
 
 ## 🌟 Vision
 
-*"Democracy is not a spectator sport. It requires active participation, fair processes, and transparent systems. DemocraVote provides the technological foundation for elections that truly represent the will of the people."*
+*"Democracy is not a spectator sport. It requires active participation, fair processes, and transparent systems. ClearBallot provides the technological foundation for elections that truly represent the will of the people."*
 
 ---
 
-**DemocraVote** - *Where every vote counts, every voice matters, and democracy thrives.*
+**ClearBallot** - *Where every vote counts, every voice matters, and democracy thrives.*
