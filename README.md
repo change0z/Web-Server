@@ -56,11 +56,29 @@ ClearBallot is a comprehensive C++ election management system designed to uphold
 ## 🚀 Quick Start
 
 ### Prerequisites
+
+#### Windows
 - CMake 3.10 or higher
-- C++17 compatible compiler (Visual Studio 2022, GCC 7+, Clang 5+)
-- Windows, Linux, or macOS
+- Visual Studio 2022 with C++17 support
+- Git for Windows
+
+#### Linux (Arch-based distributions)
+- CMake 3.10 or higher
+- GCC 7+ or Clang 5+ with C++17 support
+- Git
+- Make or Ninja build system
+
+```bash
+# Install dependencies on Arch Linux
+sudo pacman -S cmake gcc git make
+
+# Or with Clang
+sudo pacman -S cmake clang git make
+```
 
 ### Building the System
+
+#### Windows (PowerShell/CMD)
 ```bash
 # Clone the repository
 git clone https://github.com/change0z/Web-Server.git
@@ -71,32 +89,65 @@ cmake .
 cmake --build .
 ```
 
+#### Linux (Arch-based)
+```bash
+# Clone the repository
+git clone https://github.com/change0z/Web-Server.git
+cd Web-Server/VotingSystem
+
+# Configure build
+cmake .
+
+# Build the project
+make
+
+# Alternative: Use ninja for faster builds
+# cmake -G Ninja .
+# ninja
+```
+
 ### Running Elections
 
 #### 1. Election Setup (Administrators)
+
+**Windows:**
 ```bash
 # Launch admin interface
-./Debug/ElectionAdmin.exe
-
-# Available functions:
-# - Create political parties
-# - Register candidates
-# - Configure election settings
-# - Export election data
-# - Generate audit reports
+.\Debug\ElectionAdmin.exe
 ```
+
+**Linux:**
+```bash
+# Launch admin interface
+./ElectionAdmin
+```
+
+**Available functions:**
+- Create political parties
+- Register candidates
+- Configure election settings
+- Export election data
+- Generate audit reports
 
 #### 2. Voter Participation
+
+**Windows:**
 ```bash
 # Launch voter interface
-./Debug/VoterInterface.exe
-
-# Voter workflow:
-# 1. Register with personal details
-# 2. Verify eligibility (18+ years)
-# 3. Cast anonymous ballot
-# 4. Receive voting confirmation
+.\Debug\VoterInterface.exe
 ```
+
+**Linux:**
+```bash
+# Launch voter interface
+./VoterInterface
+```
+
+**Voter workflow:**
+1. Register with personal details
+2. Verify eligibility (18+ years)
+3. Cast anonymous ballot
+4. Receive voting confirmation
 
 ## 📋 Democratic Features
 
