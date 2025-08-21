@@ -33,6 +33,11 @@ class Election {
         void displayResults() const;
         void saveResultsToFile(const std::string& filename) const;
         
+        // Complete data persistence
+        void saveCompleteElectionData(const std::string& filename) const;
+        bool loadCompleteElectionData(const std::string& filename);
+        void exportToCSV(const std::string& baseFilename) const;
+        
         // Validation helpers
         bool isVoterRegistered(int uniqueId) const;
         bool hasVoterVoted(int uniqueId) const;
