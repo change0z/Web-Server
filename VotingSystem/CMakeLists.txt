@@ -14,20 +14,33 @@ add_library(ElectionLib
     InputValidator.cpp
 )
 
+# ClearBallot Service Library
+add_library(ClearBallotServiceLib
+    ClearBallotService.cpp
+    ServiceClient.cpp
+)
+target_link_libraries(ClearBallotServiceLib ElectionLib)
+
 # Election Administration Tool
 add_executable(ElectionAdmin
     admin_main.cpp
 )
-target_link_libraries(ElectionAdmin ElectionLib)
+target_link_libraries(ElectionAdmin ElectionLib ClearBallotServiceLib)
 
 # Voter Interface
 add_executable(VoterInterface
     voter_main.cpp
 )
-target_link_libraries(VoterInterface ElectionLib)
+target_link_libraries(VoterInterface ElectionLib ClearBallotServiceLib)
 
 # Keep the original for compatibility
 add_executable(VotingSystem
     main.cpp
 )
-target_link_libraries(VotingSystem ElectionLib)
+target_link_libraries(VotingSystem ElectionLib ClearBallotServiceLib)
+
+# Service Infrastructure Test
+add_executable(ServiceTest
+    service_test.cpp
+)
+target_link_libraries(ServiceTest ElectionLib ClearBallotServiceLib)
