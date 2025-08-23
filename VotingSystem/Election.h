@@ -33,6 +33,9 @@ class Election {
         void displayResults() const;
         void saveResultsToFile(const std::string& filename) const;
         
+        // Getters
+        const std::string& getTitle() const;
+        
         // Complete data persistence
         void saveCompleteElectionData(const std::string& filename) const;
         bool loadCompleteElectionData(const std::string& filename);

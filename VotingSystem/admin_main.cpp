@@ -89,8 +89,28 @@ void saveCompleteElectionData(Election& election) {
     election.saveCompleteElectionData(filename);
 }
 
+void loadElectionData(Election& election) {
+    std::string filename;
+    std::cout << "\n--- Load Election Data ---\n";
+    clearInputBuffer();
+    std::cout << "Enter filename to load from (or press Enter for 'shared_election_data.txt'): ";
+    std::getline(std::cin, filename);
+    
+    if (filename.empty()) {
+        filename = "shared_election_data.txt";
+    }
+    
+    bool success = election.loadCompleteElectionData(filename);
+    if (success) {
+        std::cout << "Election data loaded successfully!\n";
+    } else {
+        std::cout << "Failed to load election data from " << filename << "\n";
+    }
+}
+
 void exportToCSV(Election& election) {
     std::string baseFilename;
+    std::cout << "\n--- Export to CSV ---\n";
     clearInputBuffer();
     std::cout << "Enter base filename for CSV export (without extension): ";
     std::getline(std::cin, baseFilename);
@@ -141,12 +161,13 @@ int main() {
                 exportToCSV(election);
                 break;
             case 11:
-                std::cout << "Load election data feature - To be implemented\n";
+                loadElectionData(election);
                 break;
             case 0:
                 std::cout << "Election administration session ended.\n";
                 std::cout << "Saving complete election state...\n";
-                election.saveCompleteElectionData("admin_session_complete.txt");
+                election.saveCompleteElectionData("shared_election_data.txt");
+                election.saveCompleteElectionData("admin_session_complete.txt"); // Keep backup
                 election.exportToCSV("admin_session_export");
                 return 0;
             default:

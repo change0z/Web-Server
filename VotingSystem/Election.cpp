@@ -3,6 +3,7 @@
 #include <fstream>
 #include <algorithm>
 #include <iomanip>
+#include <map>
 
 Election::Election(const std::string& title) : title(title) {}
 
@@ -336,6 +337,152 @@ void Election::exportToCSV(const std::string& baseFilename) const {
         partiesFile.close();
         std::cout << "Parties exported to " << baseFilename << "_parties.csv\n";
     }
+    
+    std::cout << "CSV files exported successfully!\n";
+}
+
+// Load complete election data from file
+bool Election::loadCompleteElectionData(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cout << "Warning: Could not open file " << filename << " for reading.\n";
+        return false;
+    }
+    
+    std::string line;
+    std::string currentSection;
+    
+    // Clear existing data
+    candidates.clear();
+    voters.clear();
+    parties.clear();
+    registeredVoterIds.clear();
+    
+    std::cout << "Loading election data from " << filename << "...\n";
+    
+    while (std::getline(file, line)) {
+        // Skip empty lines and comments
+        if (line.empty() || line[0] == '=' || line == "COMPLETE_ELECTION_DATA") {
+            continue;
+        }
+        
+        // Check for section headers
+        if (line.front() == '[' && line.back() == ']') {
+            currentSection = line.substr(1, line.length() - 2);
+            continue;
+        }
+        
+        // Parse key=value pairs
+        size_t equalPos = line.find('=');
+        if (equalPos == std::string::npos) continue;
+        
+        std::string key = line.substr(0, equalPos);
+        std::string value = line.substr(equalPos + 1);
+        
+        if (currentSection == "ELECTION_INFO") {
+            if (key == "Title") {
+                title = value;
+            }
+        }
+        else if (currentSection == "PARTIES") {
+            if (key.find("Party") == 0 && key.find("_Members") == std::string::npos) {
+                // Extract party index and create party
+                size_t partyIndex = std::stoul(key.substr(5)); // Remove "Party" prefix
+                if (partyIndex >= parties.size()) {
+                    parties.resize(partyIndex + 1);
+                }
+                parties[partyIndex] = std::make_unique<Party>(value);
+            }
+        }
+        else if (currentSection == "CANDIDATES") {
+            // Parse candidate data
+            if (key.find("_Name") != std::string::npos) {
+                size_t candidateIndex = std::stoul(key.substr(9, key.find("_") - 9)); // Extract index
+                if (candidateIndex >= candidates.size()) {
+                    candidates.resize(candidateIndex + 1);
+                }
+                candidates[candidateIndex] = std::make_unique<Candidate>(value);
+            }
+            else if (key.find("_Votes") != std::string::npos) {
+                size_t candidateIndex = std::stoul(key.substr(9, key.find("_") - 9));
+                if (candidateIndex < candidates.size() && candidates[candidateIndex]) {
+                    int votes = std::stoi(value);
+                    for (int i = 0; i < votes; ++i) {
+                        candidates[candidateIndex]->receiveVote();
+                    }
+                }
+            }
+            else if (key.find("_Party") != std::string::npos) {
+                size_t candidateIndex = std::stoul(key.substr(9, key.find("_") - 9));
+                if (candidateIndex < candidates.size() && candidates[candidateIndex] && value != "Independent") {
+                    // Find party by name and assign
+                    for (const auto& party : parties) {
+                        if (party && party->getName() == value) {
+                            candidates[candidateIndex]->setParty(party);
+                            party->addMember(candidates[candidateIndex]->getName());
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        else if (currentSection == "VOTERS") {
+            // Parse voter data - collect all fields for a voter
+            static std::map<int, std::map<std::string, std::string>> voterData;
+            
+            if (key.find("Voter") == 0) {
+                size_t underscorePos = key.find('_');
+                if (underscorePos != std::string::npos) {
+                    int voterIndex = std::stoi(key.substr(5, underscorePos - 5));
+                    std::string field = key.substr(underscorePos + 1);
+                    voterData[voterIndex][field] = value;
+                    
+                    // If we have all required fields, create the voter
+                    auto& data = voterData[voterIndex];
+                    if (data.count("FirstName") && data.count("LastName") && 
+                        data.count("Phone") && data.count("Address") && 
+                        data.count("UniqueId") && data.count("Age") && 
+                        data.count("HasVoted")) {
+                        
+                        int uniqueId = std::stoi(data["UniqueId"]);
+                        int age = std::stoi(data["Age"]);
+                        bool hasVoted = (data["HasVoted"] == "1");
+                        
+                        auto voter = std::make_unique<Voter>(
+                            data["FirstName"], data["LastName"], 
+                            data["Phone"], data["Address"], 
+                            uniqueId, age
+                        );
+                        
+                        if (hasVoted) {
+                            voter->markAsVoted();
+                        }
+                        
+                        registeredVoterIds.insert(uniqueId);
+                        voters.push_back(std::move(voter));
+                    }
+                }
+            }
+        }
+    }
+    
+    file.close();
+    
+    // Remove null pointers from candidates and parties
+    candidates.erase(std::remove(candidates.begin(), candidates.end(), nullptr), candidates.end());
+    parties.erase(std::remove(parties.begin(), parties.end(), nullptr), parties.end());
+    
+    std::cout << "Election data loaded successfully!\n";
+    std::cout << "Loaded: " << parties.size() << " parties, " 
+              << candidates.size() << " candidates, " 
+              << voters.size() << " voters\n";
+    
+    return true;
+}
+
+// Getters
+const std::string& Election::getTitle() const {
+    return title;
 }
 
 // Validation helpers

@@ -119,14 +119,14 @@ void checkRegistration(Election& election) {
     }
     
     if (election.isVoterRegistered(voterId)) {
-        std::cout << "✓ You are registered to vote!\n";
+        std::cout << "[SUCCESS] You are registered to vote!\n";
         if (election.hasVoterVoted(voterId)) {
-            std::cout << "✓ You have already cast your vote.\n";
+            std::cout << "[INFO] You have already cast your vote.\n";
         } else {
-            std::cout << "○ You have not yet voted. You can cast your vote now!\n";
+            std::cout << "[READY] You have not yet voted. You can cast your vote now!\n";
         }
     } else {
-        std::cout << "✗ You are not registered. Please register first.\n";
+        std::cout << "[ERROR] You are not registered. Please register first.\n";
     }
 }
 
@@ -155,11 +155,26 @@ int main() {
     std::cout << "===========================================\n";
     std::cout << "     WELCOME TO THE VOTING SYSTEM\n";
     std::cout << "===========================================\n";
-    std::cout << "Election: 2024 Local Elections\n";
-    std::cout << "Voting is now open!\n\n";
     
-    // Load pre-configured election (simulating that admin has set it up)
-    loadDemoElection(election);
+    // Try to load admin-configured election data first
+    std::cout << "Checking for election configuration...\n";
+    bool dataLoaded = election.loadCompleteElectionData("shared_election_data.txt");
+    
+    if (!dataLoaded) {
+        // Try loading admin session data
+        dataLoaded = election.loadCompleteElectionData("admin_session_complete.txt");
+    }
+    
+    if (!dataLoaded) {
+        std::cout << "No election configuration found. Loading demo election...\n";
+        // Load pre-configured election (simulating that admin has set it up)
+        loadDemoElection(election);
+    } else {
+        std::cout << "Election configuration loaded from previous session!\n";
+    }
+    
+    std::cout << "Election: " << election.getTitle() << "\n";
+    std::cout << "Voting is now open!\n\n";
     
     std::cout << "Instructions:\n";
     std::cout << "1. You must register before voting\n";
@@ -193,7 +208,7 @@ int main() {
                 std::cout << "\nThank you for using the Voting System!\n";
                 std::cout << "Your participation strengthens democracy.\n";
                 std::cout << "Saving election state...\n";
-                election.saveCompleteElectionData("voter_session_complete.txt");
+                election.saveCompleteElectionData("shared_election_data.txt");
                 return 0;
             default:
                 std::cout << "Invalid option. Please try again.\n";

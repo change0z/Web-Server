@@ -10,6 +10,7 @@ class Candidate {
         
         std::string getName() const;
         std::shared_ptr<Party> getParty() const;
+        void setParty(std::shared_ptr<Party> party);
         void receiveVote();
         int getVoteCount() const;
 
