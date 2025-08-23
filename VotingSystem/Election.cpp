@@ -47,29 +47,65 @@ std::shared_ptr<Party> Election::getPartyByIndex(size_t index) const {
     return parties[index - 1];
 }
 
-// Voter management
+// Voter management - Enhanced with comprehensive validation
 bool Election::registerVoter(const std::string& firstName, const std::string& lastName,
                              const std::string& phoneNumber, const std::string& address,
-                             int uniqueId, int age) {
-    // Age validation
-    if (age < 18) {
-        std::cout << "Registration failed: Voter must be 18 or older. Current age: " << age << "\n";
+                             const std::string& uniqueIdStr, const std::string& ageStr) {
+    
+    std::cout << "\n=== Validating Voter Registration Data ===\n";
+    
+    // Comprehensive input validation
+    std::string validationErrors = InputValidator::validateVoterInput(
+        firstName, lastName, phoneNumber, address, uniqueIdStr, ageStr);
+    
+    if (!validationErrors.empty()) {
+        std::cout << "\n[VALIDATION FAILED]\n" << validationErrors;
+        std::cout << "\nPlease correct the above errors and try again.\n";
         return false;
     }
     
-    // Duplicate ID check
+    // Convert validated strings to appropriate types
+    int uniqueId, age;
+    try {
+        uniqueId = std::stoi(InputValidator::trim(uniqueIdStr));
+        age = std::stoi(InputValidator::trim(ageStr));
+    } catch (const std::exception&) {
+        std::cout << "[ERROR] Invalid number format in ID or age.\n";
+        return false;
+    }
+    
+    // Check for duplicate voter ID
     if (registeredVoterIds.count(uniqueId) > 0) {
-        std::cout << "Registration failed: Voter with ID " << uniqueId << " already exists.\n";
+        std::cout << "[ERROR] Voter with ID " << uniqueId << " already exists.\n";
         return false;
     }
     
-    // Register the voter
-    auto voter = std::make_unique<Voter>(firstName, lastName, phoneNumber, address, uniqueId, age);
+    // All validations passed - register the voter
+    auto voter = std::make_unique<Voter>(
+        InputValidator::trim(firstName), 
+        InputValidator::trim(lastName), 
+        InputValidator::trim(phoneNumber), 
+        InputValidator::trim(address), 
+        uniqueId, 
+        age
+    );
+    
     voters.push_back(std::move(voter));
     registeredVoterIds.insert(uniqueId);
     
-    std::cout << "Voter '" << firstName << " " << lastName << "' registered successfully with ID: " << uniqueId << "\n";
+    std::cout << "\n[SUCCESS] Voter '" << firstName << " " << lastName 
+              << "' registered successfully with ID: " << uniqueId << "\n";
+    std::cout << "Validation passed: All input requirements met.\n";
     return true;
+}
+
+// Legacy method for backward compatibility
+bool Election::registerVoter(const std::string& firstName, const std::string& lastName,
+                             const std::string& phoneNumber, const std::string& address,
+                             int uniqueId, int age) {
+    // Convert to string format and use the enhanced validation method
+    return registerVoter(firstName, lastName, phoneNumber, address, 
+                        std::to_string(uniqueId), std::to_string(age));
 }
 
 // Voting functionality

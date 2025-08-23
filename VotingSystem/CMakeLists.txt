@@ -3,12 +3,15 @@ project(VotingSystem)
 
 set(CMAKE_CXX_STANDARD 17)
 
+
+
 # Shared library for common election functionality
 add_library(ElectionLib
     Election.cpp
     Candidate.cpp
     Voter.cpp
     party.cpp
+    InputValidator.cpp
 )
 
 # Election Administration Tool

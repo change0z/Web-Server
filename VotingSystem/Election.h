@@ -5,6 +5,7 @@
 #include "Candidate.h"
 #include "Voter.h"
 #include "party.h"
+#include "InputValidator.h"
 
 class Election {
     public:
@@ -19,7 +20,12 @@ class Election {
         void displayParties() const;
         std::shared_ptr<Party> getPartyByIndex(size_t index) const;
         
-        // Voter management
+        // Voter management - Enhanced with validation
+        bool registerVoter(const std::string& firstName, const std::string& lastName,
+                           const std::string& phoneNumber, const std::string& address,
+                           const std::string& uniqueIdStr, const std::string& ageStr);
+        
+        // Legacy method for backward compatibility
         bool registerVoter(const std::string& firstName, const std::string& lastName,
                            const std::string& phoneNumber, const std::string& address,
                            int uniqueId, int age);

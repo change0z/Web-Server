@@ -23,46 +23,41 @@ void displayVoterMenu() {
 void registerVoter(Election& election) {
     std::string firstName, lastName, phoneNumber, address;
     std::string uniqueIdStr, ageStr;
-    int uniqueId, age;
     
-    std::cout << "\n=== Voter Registration ===\n";
+    std::cout << "\n=== Enhanced Voter Registration ===\n";
     std::cout << "Please provide your information to register:\n";
+    std::cout << "Note: All fields will be validated according to election requirements.\n\n";
     
     clearInputBuffer();
     
-    std::cout << "First name: ";
+    std::cout << "First name (alphabets only, 2-50 characters): ";
     std::getline(std::cin, firstName);
     
-    std::cout << "Last name: ";
+    std::cout << "Last name (alphabets only, 2-50 characters): ";
     std::getline(std::cin, lastName);
     
-    std::cout << "Phone number: ";
+    std::cout << "Phone number (exactly 10 digits): ";
     std::getline(std::cin, phoneNumber);
     
-    std::cout << "Address: ";
+    std::cout << "Address (5-500 characters): ";
     std::getline(std::cin, address);
     
-    std::cout << "Unique ID number: ";
+    std::cout << "Unique ID number (exactly 9 digits): ";
     std::getline(std::cin, uniqueIdStr);
     
-    std::cout << "Age: ";
+    std::cout << "Age (18 or older): ";
     std::getline(std::cin, ageStr);
     
-    try {
-        uniqueId = std::stoi(uniqueIdStr);
-        age = std::stoi(ageStr);
-    } catch (const std::exception& e) {
-        std::cout << "Error: Invalid input for ID or age. Please enter valid numbers.\n";
-        return;
-    }
-    
-    bool success = election.registerVoter(firstName, lastName, phoneNumber, address, uniqueId, age);
+    // Use enhanced validation method
+    bool success = election.registerVoter(firstName, lastName, phoneNumber, address, uniqueIdStr, ageStr);
     
     if (success) {
         std::cout << "\n*** Registration Successful! ***\n";
         std::cout << "Welcome to the election, " << firstName << " " << lastName << "!\n";
-        std::cout << "Your voter ID is: " << uniqueId << "\n";
         std::cout << "You can now cast your vote.\n";
+    } else {
+        std::cout << "\n*** Registration Failed ***\n";
+        std::cout << "Please review the requirements and try again.\n";
     }
 }
 
