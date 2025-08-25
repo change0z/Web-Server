@@ -15,7 +15,16 @@
 
 ## 🎯 System Overview
 
-ClearBallot is a comprehensive C++ election management system designed to uphold democratic values through technology. The system separates election administration from voter participation, ensuring fair and secure elections.
+ClearBallot is a comprehensive C++ election management system designed to uphold democratic values through technology. The system features both **traditional console interfaces** and a **modern service-oriented architecture** for scalability and future expansion.
+
+### 🏗️ **Service Architecture (NEW)**
+ClearBallot now includes a **service-based architecture** that enables:
+- **Multi-Election Support**: Manage multiple concurrent elections
+- **Thread-Safe Operations**: Concurrent access with proper synchronization  
+- **Interface Flexibility**: Foundation for web, mobile, and API interfaces
+- **Centralized Management**: Single service managing all election operations
+
+📚 **[Complete Service Architecture Guide →](VotingSystem/SERVICE_ARCHITECTURE_GUIDE.md)**
 
 ### 🏛️ Administrative Interface (`ElectionAdmin.exe`)
 *For Election Officials & Administrators*
@@ -53,6 +62,15 @@ ClearBallot is a comprehensive C++ election management system designed to uphold
 - **Multiple Export Formats**: TXT (human-readable) and CSV (analysis-ready)
 - **Audit Trail**: Comprehensive election data for verification and compliance
 
+### Service-Oriented Architecture
+- **ClearBallotService**: Core service managing multiple elections with thread safety
+- **ServiceClient**: Clean API for console, web, and mobile interfaces
+- **Multi-Election Support**: Concurrent election management in a single service
+- **Backward Compatibility**: Existing console apps work unchanged
+- **Future-Ready**: Foundation for web interfaces, databases, and enterprise deployment
+
+📚 **[Detailed Architecture Documentation →](VotingSystem/SERVICE_ARCHITECTURE_GUIDE.md)**
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -87,6 +105,9 @@ cd Web-Server/VotingSystem
 # Build with CMake
 cmake .
 cmake --build .
+
+# Test the service architecture (optional)
+cd Debug && .\ServiceTest.exe
 ```
 
 #### Linux (Arch-based)
@@ -101,10 +122,31 @@ cmake .
 # Build the project
 make
 
+# Test the service architecture (optional)
+cd Debug && ./ServiceTest
+
 # Alternative: Use ninja for faster builds
 # cmake -G Ninja .
 # ninja
 ```
+
+## 🎮 Usage Options
+
+ClearBallot offers **two usage patterns** to accommodate different needs:
+
+### **Option 1: Traditional Console Applications (Current)**
+Use the existing console interfaces for immediate election management:
+- `ElectionAdmin.exe` - Election administration
+- `VoterInterface.exe` - Voter registration and voting
+- `VotingSystem.exe` - Combined interface (legacy)
+
+### **Option 2: Service-Based Architecture (New)**
+Use the modern service layer for enhanced capabilities:
+- **ServiceTest.exe** - Test and demonstrate service functionality
+- **Service API** - For custom applications and future web/mobile interfaces
+- **Concurrent Elections** - Manage multiple elections simultaneously
+
+📚 **[Service Usage Examples →](VotingSystem/SERVICE_ARCHITECTURE_GUIDE.md#how-to-use-the-service)**
 
 ### Running Elections
 
