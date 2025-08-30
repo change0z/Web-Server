@@ -47,6 +47,111 @@ std::shared_ptr<Party> Election::getPartyByIndex(size_t index) const {
     return parties[index - 1];
 }
 
+// Region management
+std::shared_ptr<Region> Election::createRegion(const std::string& name, const std::string& code) {
+    // Check if region with same code already exists
+    for (const auto& region : regions) {
+        if (region->getCode() == code) {
+            std::cout << "Error: Region with code '" << code << "' already exists.\n";
+            return nullptr;
+        }
+    }
+    
+    auto region = std::make_shared<Region>(name, code);
+    regions.push_back(region);
+    std::cout << "Region '" << name << "' (Code: " << code << ") created successfully.\n";
+    return region;
+}
+
+void Election::displayRegions() const {
+    if (regions.empty()) {
+        std::cout << "No regions created.\n";
+        return;
+    }
+    
+    std::cout << "\n=== Election Regions ===\n";
+    for (size_t i = 0; i < regions.size(); ++i) {
+        std::cout << i + 1 << ". " << regions[i]->getName() 
+                  << " (" << regions[i]->getCode() << ")\n";
+        std::cout << "   Candidates: " << regions[i]->getCandidates().size()
+                  << ", Voters: " << regions[i]->getVoters().size() << "\n";
+    }
+}
+
+std::shared_ptr<Region> Election::getRegionByIndex(size_t index) const {
+    if (index == 0 || index > regions.size()) {
+        return nullptr;
+    }
+    return regions[index - 1];
+}
+
+std::shared_ptr<Region> Election::getRegionByCode(const std::string& code) const {
+    for (const auto& region : regions) {
+        if (region->getCode() == code) {
+            return region;
+        }
+    }
+    return nullptr;
+}
+
+// Enhanced candidate management with region support
+bool Election::addCandidateToRegion(const std::string& name, std::shared_ptr<Region> region) {
+    if (!region) {
+        std::cout << "Error: Invalid region provided.\n";
+        return false;
+    }
+    
+    // Check if candidate already exists in ANY region (global restriction)
+    if (globalCandidateRegistry.find(name) != globalCandidateRegistry.end()) {
+        std::cout << "Error: Candidate '" << name << "' is already registered in another region.\n";
+        std::cout << "Same candidate cannot be enlisted in multiple regions.\n";
+        return false;
+    }
+    
+    auto candidate = std::make_shared<Candidate>(name, nullptr, region);
+    if (region->addCandidate(candidate)) {
+        // Add to global registry
+        globalCandidateRegistry[name].insert(region->getCode());
+        std::cout << "Independent candidate '" << name << "' added to region '" 
+                  << region->getName() << "'.\n";
+        return true;
+    }
+    return false;
+}
+
+bool Election::addCandidateToRegion(const std::string& name, std::shared_ptr<Party> party, std::shared_ptr<Region> region) {
+    if (!region || !party) {
+        std::cout << "Error: Invalid region or party provided.\n";
+        return false;
+    }
+    
+    // Check if candidate already exists in ANY region (global restriction)
+    if (globalCandidateRegistry.find(name) != globalCandidateRegistry.end()) {
+        std::cout << "Error: Candidate '" << name << "' is already registered in another region.\n";
+        std::cout << "Same candidate cannot be enlisted in multiple regions.\n";
+        return false;
+    }
+    
+    // Check if party already has a candidate in this region
+    if (region->hasPartyCandidate(party)) {
+        std::cout << "Error: Party '" << party->getName() 
+                  << "' already has a candidate in region '" << region->getName() << "'.\n";
+        std::cout << "One party cannot have more than one candidate per region.\n";
+        return false;
+    }
+    
+    auto candidate = std::make_shared<Candidate>(name, party, region);
+    if (region->addCandidate(candidate)) {
+        party->addMember(name);
+        // Add to global registry
+        globalCandidateRegistry[name].insert(region->getCode());
+        std::cout << "Candidate '" << name << "' added to party '" << party->getName() 
+                  << "' in region '" << region->getName() << "'.\n";
+        return true;
+    }
+    return false;
+}
+
 // Voter management - Enhanced with comprehensive validation
 bool Election::registerVoter(const std::string& firstName, const std::string& lastName,
                              const std::string& phoneNumber, const std::string& address,
@@ -108,6 +213,66 @@ bool Election::registerVoter(const std::string& firstName, const std::string& la
                         std::to_string(uniqueId), std::to_string(age));
 }
 
+// Regional voter registration
+bool Election::registerVoterInRegion(const std::string& firstName, const std::string& lastName,
+                                     const std::string& phoneNumber, const std::string& address,
+                                     const std::string& uniqueIdStr, const std::string& ageStr,
+                                     std::shared_ptr<Region> region) {
+    if (!region) {
+        std::cout << "Error: Invalid region provided for voter registration.\n";
+        return false;
+    }
+    
+    std::cout << "\n=== Validating Voter Registration Data for Region: " << region->getName() << " ===\n";
+    
+    // Comprehensive input validation
+    std::string validationErrors = InputValidator::validateVoterInput(
+        firstName, lastName, phoneNumber, address, uniqueIdStr, ageStr);
+    
+    if (!validationErrors.empty()) {
+        std::cout << "\n[VALIDATION FAILED]\n" << validationErrors;
+        std::cout << "\nPlease correct the above errors and try again.\n";
+        return false;
+    }
+    
+    // Convert validated strings to appropriate types
+    int uniqueId, age;
+    try {
+        uniqueId = std::stoi(InputValidator::trim(uniqueIdStr));
+        age = std::stoi(InputValidator::trim(ageStr));
+    } catch (const std::exception&) {
+        std::cout << "[ERROR] Invalid number format in ID or age.\n";
+        return false;
+    }
+    
+    // Check for duplicate voter ID globally
+    if (registeredVoterIds.count(uniqueId) > 0) {
+        std::cout << "[ERROR] Voter with ID " << uniqueId << " already exists.\n";
+        return false;
+    }
+    
+    // Create voter with region assignment
+    auto voter = std::make_shared<Voter>(
+        InputValidator::trim(firstName), 
+        InputValidator::trim(lastName), 
+        InputValidator::trim(phoneNumber), 
+        InputValidator::trim(address), 
+        uniqueId, 
+        age,
+        region
+    );
+    
+    // Add voter to region
+    region->addVoter(voter);
+    registeredVoterIds.insert(uniqueId);
+    
+    std::cout << "\n[SUCCESS] Voter '" << firstName << " " << lastName 
+              << "' registered successfully in region '" << region->getName() 
+              << "' with ID: " << uniqueId << "\n";
+    std::cout << "Validation passed: All input requirements met.\n";
+    return true;
+}
+
 // Voting functionality
 bool Election::castVote(int voterId, int candidateIndex) {
     // Find voter
@@ -135,6 +300,60 @@ bool Election::castVote(int voterId, int candidateIndex) {
     
     std::cout << "Vote cast successfully by " << voter->getFullName() 
               << " for " << candidates[candidateIndex]->getName() << "\n";
+    return true;
+}
+
+// Regional voting functionality
+bool Election::castVoteInRegion(int voterId, int candidateIndex, std::shared_ptr<Region> region) {
+    if (!region) {
+        std::cout << "Voting failed: Invalid region provided.\n";
+        return false;
+    }
+    
+    // Check if voter can vote in this region
+    if (!region->canVoterVoteInRegion(voterId)) {
+        std::cout << "Voting failed: Voter with ID " << voterId 
+                  << " is not registered to vote in region '" << region->getName() << "'.\n";
+        std::cout << "Voters can only vote in their assigned region.\n";
+        return false;
+    }
+    
+    // Find voter in region
+    const auto& votersInRegion = region->getVoters();
+    std::shared_ptr<Voter> voter = nullptr;
+    for (const auto& v : votersInRegion) {
+        if (v->getUniqueId() == voterId) {
+            voter = v;
+            break;
+        }
+    }
+    
+    if (!voter) {
+        std::cout << "Voting failed: Voter with ID " << voterId 
+                  << " not found in region '" << region->getName() << "'.\n";
+        return false;
+    }
+    
+    // Check if voter has already voted
+    if (voter->hasVoted()) {
+        std::cout << "Voting failed: Voter " << voter->getFullName() << " has already voted.\n";
+        return false;
+    }
+    
+    // Get candidates in this region
+    const auto& candidatesInRegion = region->getCandidates();
+    if (candidateIndex < 0 || candidateIndex >= static_cast<int>(candidatesInRegion.size())) {
+        std::cout << "Voting failed: Invalid candidate index for region '" << region->getName() << "'.\n";
+        return false;
+    }
+    
+    // Cast vote for the candidate in this region
+    candidatesInRegion[candidateIndex]->receiveVote();
+    voter->markAsVoted();
+    
+    std::cout << "Vote cast successfully by " << voter->getFullName() 
+              << " for " << candidatesInRegion[candidateIndex]->getName() 
+              << " in region '" << region->getName() << "'\n";
     return true;
 }
 
@@ -192,6 +411,70 @@ void Election::displayResults() const {
     // Display results sorted by vote count
     std::vector<std::pair<int, std::string>> results;
     for (const auto& candidate : candidates) {
+        std::string candidateInfo = candidate->getName();
+        if (candidate->getParty()) {
+            candidateInfo += " (" + candidate->getParty()->getName() + ")";
+        } else {
+            candidateInfo += " (Independent)";
+        }
+        results.emplace_back(candidate->getVoteCount(), candidateInfo);
+    }
+    
+    std::sort(results.rbegin(), results.rend());
+    
+    for (size_t i = 0; i < results.size(); ++i) {
+        double percentage = totalVotes > 0 ? (static_cast<double>(results[i].first) / totalVotes) * 100.0 : 0.0;
+        std::cout << i + 1 << ". " << results[i].second 
+                  << " - " << results[i].first << " votes (" 
+                  << std::fixed << std::setprecision(1) << percentage << "%)\n";
+    }
+}
+
+// Regional display methods
+void Election::displayCandidatesInRegion(std::shared_ptr<Region> region) const {
+    if (!region) {
+        std::cout << "Error: Invalid region provided.\n";
+        return;
+    }
+    
+    region->displayCandidatesInRegion();
+}
+
+void Election::displayVotersInRegion(std::shared_ptr<Region> region) const {
+    if (!region) {
+        std::cout << "Error: Invalid region provided.\n";
+        return;
+    }
+    
+    region->displayVotersInRegion();
+}
+
+void Election::displayResultsInRegion(std::shared_ptr<Region> region) const {
+    if (!region) {
+        std::cout << "Error: Invalid region provided.\n";
+        return;
+    }
+    
+    std::cout << "\n=== Election Results for Region: " << region->getName() << " ===\n";
+    
+    const auto& candidatesInRegion = region->getCandidates();
+    if (candidatesInRegion.empty()) {
+        std::cout << "No candidates in this region.\n";
+        return;
+    }
+    
+    // Count total votes in this region
+    int totalVotes = 0;
+    for (const auto& candidate : candidatesInRegion) {
+        totalVotes += candidate->getVoteCount();
+    }
+    
+    std::cout << "Total votes cast in region: " << totalVotes << "\n";
+    std::cout << "Total registered voters in region: " << region->getVoters().size() << "\n\n";
+    
+    // Display results sorted by vote count
+    std::vector<std::pair<int, std::string>> results;
+    for (const auto& candidate : candidatesInRegion) {
         std::string candidateInfo = candidate->getName();
         if (candidate->getParty()) {
             candidateInfo += " (" + candidate->getParty()->getName() + ")";
@@ -531,6 +814,28 @@ bool Election::hasVoterVoted(int uniqueId) const {
     return voter && voter->hasVoted();
 }
 
+// Regional validation helpers
+bool Election::isVoterInRegion(int uniqueId, std::shared_ptr<Region> region) const {
+    if (!region) return false;
+    return region->hasVoter(uniqueId);
+}
+
+bool Election::canCandidateBeAddedToRegion(const std::string& candidateName, std::shared_ptr<Party> party, std::shared_ptr<Region> region) const {
+    if (!region) return false;
+    
+    // Check if candidate already exists in ANY region
+    if (globalCandidateRegistry.find(candidateName) != globalCandidateRegistry.end()) {
+        return false;
+    }
+    
+    // Check if party already has a candidate in this region
+    if (party && region->hasPartyCandidate(party)) {
+        return false;
+    }
+    
+    return true;
+}
+
 // Helper methods
 Voter* Election::findVoterByUniqueId(int uniqueId) {
     auto it = std::find_if(voters.begin(), voters.end(),
@@ -538,4 +843,16 @@ Voter* Election::findVoterByUniqueId(int uniqueId) {
             return voter->getUniqueId() == uniqueId;
         });
     return (it != voters.end()) ? it->get() : nullptr;
+}
+
+std::shared_ptr<Candidate> Election::findCandidateInRegion(const std::string& candidateName, std::shared_ptr<Region> region) const {
+    if (!region) return nullptr;
+    
+    const auto& candidates = region->getCandidates();
+    for (const auto& candidate : candidates) {
+        if (candidate->getName() == candidateName) {
+            return candidate;
+        }
+    }
+    return nullptr;
 }

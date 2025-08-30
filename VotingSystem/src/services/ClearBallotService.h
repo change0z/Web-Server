@@ -1,5 +1,5 @@
 #pragma once
-#include "Election.h"
+#include "../core/Election.h"
 #include <memory>
 #include <map>
 #include <mutex>

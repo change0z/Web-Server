@@ -2,7 +2,7 @@
 #include <string>
 #include <limits>
 #include <stdexcept>
-#include "Election.h"
+#include "../src/core/Election.h"
 
 void clearInputBuffer() {
     std::cin.clear();
