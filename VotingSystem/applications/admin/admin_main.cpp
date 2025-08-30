@@ -60,7 +60,7 @@ void addPartyCandidate(Election& election) {
     
     try {
         partyIndex = std::stoi(partyIndexStr);
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         std::cout << "Error: Invalid party number.\n";
         return;
     }

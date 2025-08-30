@@ -85,7 +85,7 @@ void addCandidatesToRegions(Election& election) {
                 std::cout << "Invalid party number.\n";
             }
         }
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         std::cout << "Error: Invalid input format.\n";
     }
 }
@@ -128,7 +128,7 @@ void registerVotersInRegions(Election& election) {
         } else {
             std::cout << "Invalid region number.\n";
         }
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         std::cout << "Error: Invalid region number format.\n";
     }
 }
@@ -154,7 +154,7 @@ void displayRegionalInfo(Election& election) {
         } else {
             std::cout << "Invalid region number.\n";
         }
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         std::cout << "Error: Invalid input format.\n";
     }
 }
@@ -194,7 +194,7 @@ void castVoteInRegion(Election& election) {
         int candIdx = std::stoi(candidateIndex);
         election.castVoteInRegion(voterId, candIdx, region);
         
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         std::cout << "Error: Invalid input format.\n";
     }
 }
@@ -218,7 +218,7 @@ void viewRegionalResults(Election& election) {
         } else {
             std::cout << "Invalid region number.\n";
         }
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         std::cout << "Error: Invalid input format.\n";
     }
 }

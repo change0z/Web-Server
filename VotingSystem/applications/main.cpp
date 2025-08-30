@@ -56,7 +56,7 @@ void registerVoter(Election& election) {
     try {
         uniqueId = std::stoi(uniqueIdStr);
         age = std::stoi(ageStr);
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         std::cout << "Error: Invalid input for ID or age. Please enter valid numbers.\n";
         return;
     }
@@ -98,7 +98,7 @@ void addPartyCandidate(Election& election) {
     
     try {
         partyIndex = std::stoi(partyIndexStr);
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         std::cout << "Error: Invalid party number.\n";
         return;
     }
@@ -128,7 +128,7 @@ void castVote(Election& election) {
     try {
         voterId = std::stoi(voterIdStr);
         candidateIndex = std::stoi(candidateIndexStr);
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         std::cout << "Error: Invalid input. Please enter valid numbers.\n";
         return;
     }

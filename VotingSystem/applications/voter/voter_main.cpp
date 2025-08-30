@@ -82,7 +82,7 @@ void castVote(Election& election) {
     try {
         voterId = std::stoi(voterIdStr);
         candidateIndex = std::stoi(candidateIndexStr);
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         std::cout << "Error: Invalid input. Please enter valid numbers.\n";
         return;
     }
@@ -108,7 +108,7 @@ void checkRegistration(Election& election) {
     
     try {
         voterId = std::stoi(voterIdStr);
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         std::cout << "Error: Invalid voter ID format.\n";
         return;
     }
