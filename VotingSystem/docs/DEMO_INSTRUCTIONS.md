@@ -1,33 +1,59 @@
-# Voting System Demo Instructions
+# ClearBallot System Demo Instructions
 
-## Overview
-The voting system is now split into two separate applications:
+*Updated for Service-Oriented Architecture - August 2025*
 
-1. **ElectionAdmin.exe** - For election officials to set up elections
-2. **VoterInterface.exe** - For voters to register and cast votes
+## 🎯 **Demo Overview**
 
-## Demo Workflow
+ClearBallot now features a **service-oriented architecture** with two primary applications that demonstrate the complete election workflow. Both applications use the same underlying ServiceClient API, showcasing the modern architecture while maintaining user-friendly interfaces.
 
-### Step 1: Election Setup (Admin)
-Run `ElectionAdmin.exe` to set up the election:
+### **Demo Applications**
+1. **ElectionAdmin.exe** - Election administration and setup
+2. **VoterInterface.exe** - Voter registration and voting experience
 
+---
+
+## 🚀 **Quick Demo Workflow**
+
+### **Step 1: Start Election Administration**
+```bash
+cd VotingSystem\Debug
+.\ElectionAdmin.exe
 ```
-.\Debug\ElectionAdmin.exe
+
+**Admin Operations**:
+- ✅ Create political parties (Democratic, Republican, Green, etc.)
+- ✅ Add party candidates and independents  
+- ✅ Configure election settings
+- ✅ Save complete election data for voter interface
+- ✅ Export results to CSV format
+
+### **Step 2: Voter Experience**
+```bash
+.\VoterInterface.exe
 ```
 
-**Admin tasks:**
-1. Create parties (Democratic, Republican, Green)
-2. Add candidates to parties
-3. Add independent candidates
-4. Review candidate list
-5. Save election configuration
+**Voter Operations**:
+- ✅ Register with validated personal information
+- ✅ View available candidates and parties
+- ✅ Cast secure, anonymous votes
+- ✅ Check registration status
+- ✅ View real-time election results
 
-### Step 2: Voter Experience
-Run `VoterInterface.exe` for the voter experience:
+---
 
-```
-.\Debug\VoterInterface.exe
-```
+## 🏗️ **Architecture Demonstration**
+
+### **Service-Oriented Features Showcased**:
+- **Thread-Safe Operations**: Multiple applications can run simultaneously
+- **Data Persistence**: Election state shared between admin and voter interfaces
+- **Input Validation**: Security-focused validation prevents malicious input
+- **Error Handling**: Graceful error management with user-friendly messages
+- **Multi-Election Ready**: Foundation for handling concurrent elections
+
+### **Legacy Compatibility**:
+- Both applications can be used independently
+- Data formats compatible with legacy direct-access approach
+- Backward compatibility maintained for existing workflows
 
 **Voter tasks:**
 1. Register to vote (with full validation)
