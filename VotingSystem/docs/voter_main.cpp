@@ -2,7 +2,7 @@
 #include <string>
 #include <limits>
 #include <stdexcept>
-#include "../../src/core/Election.h"
+#include "../../src/services/ServiceClient.h"
 
 void clearInputBuffer() {
     std::cin.clear();
@@ -20,7 +20,7 @@ void displayVoterMenu() {
     std::cout << "Choose an option: ";
 }
 
-void registerVoter(Election& election) {
+void registerVoter(ServiceClient& client, int electionId) {
     std::string firstName, lastName, phoneNumber, address;
     std::string uniqueIdStr, ageStr;
     
@@ -48,20 +48,21 @@ void registerVoter(Election& election) {
     std::cout << "Age (18 or older): ";
     std::getline(std::cin, ageStr);
     
-    // Use enhanced validation method
-    bool success = election.registerVoter(firstName, lastName, phoneNumber, address, uniqueIdStr, ageStr);
+    // Use ServiceClient for voter registration
+    ServiceResponse response = client.registerVoter(electionId, firstName, lastName, phoneNumber, address, uniqueIdStr, ageStr);
     
-    if (success) {
+    if (response.success) {
         std::cout << "\n*** Registration Successful! ***\n";
         std::cout << "Welcome to the election, " << firstName << " " << lastName << "!\n";
         std::cout << "You can now cast your vote.\n";
     } else {
         std::cout << "\n*** Registration Failed ***\n";
+        std::cout << "Error: " << response.message << "\n";
         std::cout << "Please review the requirements and try again.\n";
     }
 }
 
-void castVote(Election& election) {
+void castVote(ServiceClient& client, int electionId) {
     std::string voterIdStr, candidateIndexStr;
     int voterId, candidateIndex;
     
@@ -69,7 +70,13 @@ void castVote(Election& election) {
     
     // Show available candidates
     std::cout << "Available candidates:\n";
-    election.displayCandidates();
+    ServiceResponse candidatesResponse = client.getCandidates(electionId);
+    if (candidatesResponse.success) {
+        std::cout << candidatesResponse.message << "\n";
+    } else {
+        std::cout << "Error retrieving candidates: " << candidatesResponse.message << "\n";
+        return;
+    }
     
     clearInputBuffer();
     
@@ -87,16 +94,19 @@ void castVote(Election& election) {
         return;
     }
     
-    bool success = election.castVote(voterId, candidateIndex);
+    ServiceResponse response = client.castVote(electionId, voterId, candidateIndex);
     
-    if (success) {
+    if (response.success) {
         std::cout << "\n*** Vote Successfully Cast! ***\n";
         std::cout << "Thank you for participating in the democratic process.\n";
         std::cout << "Your vote has been recorded securely.\n";
+    } else {
+        std::cout << "\n*** Voting Failed ***\n";
+        std::cout << "Error: " << response.message << "\n";
     }
 }
 
-void checkRegistration(Election& election) {
+void checkRegistration(ServiceClient& client, int electionId) {
     std::string voterIdStr;
     int voterId;
     
@@ -113,62 +123,77 @@ void checkRegistration(Election& election) {
         return;
     }
     
-    if (election.isVoterRegistered(voterId)) {
+    ServiceResponse response = client.checkVoterRegistration(electionId, voterId);
+    
+    if (response.success) {
         std::cout << "[SUCCESS] You are registered to vote!\n";
-        if (election.hasVoterVoted(voterId)) {
-            std::cout << "[INFO] You have already cast your vote.\n";
-        } else {
-            std::cout << "[READY] You have not yet voted. You can cast your vote now!\n";
-        }
+        std::cout << response.message << "\n";
     } else {
         std::cout << "[ERROR] You are not registered. Please register first.\n";
+        std::cout << "Details: " << response.message << "\n";
     }
 }
 
 // Load pre-configured election (simulating admin setup)
-void loadDemoElection(Election& election) {
+void loadDemoElection(ServiceClient& client, int electionId) {
     std::cout << "Loading election configuration...\n";
     
     // Create demo parties and candidates (simulating admin setup)
-    auto democraticParty = election.createParty("Democratic Party");
-    auto republicanParty = election.createParty("Republican Party");
-    auto greenParty = election.createParty("Green Party");
+    client.createParty(electionId, "Democratic Party");
+    client.createParty(electionId, "Republican Party");
+    client.createParty(electionId, "Green Party");
     
-    election.addCandidate("Alice Johnson", democraticParty);
-    election.addCandidate("Bob Smith", republicanParty);
-    election.addCandidate("Carol Green", greenParty);
-    election.addCandidate("David Independent"); // Independent candidate
+    client.addCandidateWithParty(electionId, "Alice Johnson", "Democratic Party");
+    client.addCandidateWithParty(electionId, "Bob Smith", "Republican Party");
+    client.addCandidateWithParty(electionId, "Carol Green", "Green Party");
+    client.addCandidate(electionId, "David Independent"); // Independent candidate
     
     std::cout << "Election setup complete!\n";
     std::cout << "Candidates and parties have been configured by election officials.\n\n";
 }
 
 int main() {
-    Election election("2024 Local Elections");
-    int choice;
+    ServiceClient client;
+    int electionId;
     
     std::cout << "===========================================\n";
     std::cout << "     WELCOME TO THE VOTING SYSTEM\n";
     std::cout << "===========================================\n";
     
-    // Try to load admin-configured election data first
-    std::cout << "Checking for election configuration...\n";
-    bool dataLoaded = election.loadCompleteElectionData("shared_election_data.txt");
+    // Connect to the service
+    std::cout << "Connecting to ClearBallot service...\n";
+    if (!client.connectToService()) {
+        std::cout << "Error: Unable to connect to ClearBallot service.\n";
+        std::cout << "Please ensure the service is running and try again.\n";
+        return 1;
+    }
+    std::cout << "Successfully connected to ClearBallot service!\n\n";
     
-    if (!dataLoaded) {
-        // Try loading admin session data
-        dataLoaded = election.loadCompleteElectionData("admin_session_complete.txt");
+    // Create or use default election
+    electionId = client.createElection("2024 Local Elections");
+    if (electionId <= 0) {
+        std::cout << "Error: Unable to create election.\n";
+        return 1;
     }
     
-    if (!dataLoaded) {
+    // Try to load admin-configured election data first
+    std::cout << "Checking for election configuration...\n";
+    ServiceResponse loadResponse = client.loadElectionData(electionId, "shared_election_data.txt");
+    
+    if (!loadResponse.success) {
+        // Try loading admin session data
+        loadResponse = client.loadElectionData(electionId, "admin_session_complete.txt");
+    }
+    
+    if (!loadResponse.success) {
         std::cout << "No election configuration found. Loading demo election...\n";
         // Load pre-configured election (simulating that admin has set it up)
-        loadDemoElection(election);
+        loadDemoElection(client, electionId);
     } else {
         std::cout << "Election configuration loaded from previous session!\n";
     }
     
-    std::cout << "Election: " << election.getTitle() << "\n";
+    std::cout << "Election: 2024 Local Elections\n";
     std::cout << "Voting is now open!\n\n";
     
     std::cout << "Instructions:\n";
@@ -177,33 +202,49 @@ int main() {
     std::cout << "3. Each person can only vote once\n";
     std::cout << "4. Your vote is secret and secure\n\n";
     
+    int choice;
     while (true) {
         displayVoterMenu();
         std::cin >> choice;
         
         switch (choice) {
             case 1:
-                registerVoter(election);
+                registerVoter(client, electionId);
                 break;
             case 2:
-                castVote(election);
+                castVote(client, electionId);
                 break;
             case 3:
                 std::cout << "\n=== Available Candidates ===\n";
-                election.displayCandidates();
+                {
+                    ServiceResponse candidatesResponse = client.getCandidates(electionId);
+                    if (candidatesResponse.success) {
+                        std::cout << candidatesResponse.message << "\n";
+                    } else {
+                        std::cout << "Error retrieving candidates: " << candidatesResponse.message << "\n";
+                    }
+                }
                 break;
             case 4:
-                checkRegistration(election);
+                checkRegistration(client, electionId);
                 break;
             case 5:
                 std::cout << "\n=== Current Election Results ===\n";
-                election.displayResults();
+                {
+                    ServiceResponse resultsResponse = client.getElectionResults(electionId);
+                    if (resultsResponse.success) {
+                        std::cout << resultsResponse.message << "\n";
+                    } else {
+                        std::cout << "Error retrieving results: " << resultsResponse.message << "\n";
+                    }
+                }
                 break;
             case 0:
                 std::cout << "\nThank you for using the Voting System!\n";
                 std::cout << "Your participation strengthens democracy.\n";
                 std::cout << "Saving election state...\n";
-                election.saveCompleteElectionData("shared_election_data.txt");
+                client.saveCompleteElectionData(electionId, "shared_election_data.txt");
+                client.disconnect();
                 return 0;
             default:
                 std::cout << "Invalid option. Please try again.\n";
