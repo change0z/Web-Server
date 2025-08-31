@@ -322,11 +322,22 @@ ServiceResponse ServiceClient::addCandidateToRegion(int electionId, const std::s
             return createErrorResponse("Region not found: " + regionCode);
         }
         
-        // Find party by name
-        std::shared_ptr<Party> party = election->getPartyByName(partyName);
+        // Find party by name - iterate through party indices since direct access not available
+        std::shared_ptr<Party> party = nullptr;
+        
+        // First try to find an existing party by checking each index
+        for (size_t i = 1; i <= 100; ++i) { // Reasonable upper limit
+            auto testParty = election->getPartyByIndex(i);
+            if (!testParty) break; // No more parties
+            if (testParty->getName() == partyName) {
+                party = testParty;
+                break;
+            }
+        }
+        
         if (!party) {
             // Try to create the party if it doesn't exist
-            party = election->addParty(partyName);
+            party = election->createParty(partyName);
             if (!party) {
                 return createErrorResponse("Party not found and could not be created: " + partyName);
             }
