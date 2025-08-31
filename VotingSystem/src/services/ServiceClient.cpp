@@ -238,7 +238,7 @@ ServiceResponse ServiceClient::createRegion(int electionId, const std::string& n
         if (region) {
             return ServiceResponse(true, "Region '" + name + "' created successfully");
         } else {
-            return createErrorResponse("Failed to create region");
+            return createErrorResponse("Failed to create region (name: '" + name + "', code: '" + code + "')");
         }
     } catch (const std::exception& e) {
         return createErrorResponse("Exception in createRegion: " + std::string(e.what()));
