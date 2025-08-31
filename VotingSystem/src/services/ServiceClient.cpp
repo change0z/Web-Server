@@ -241,7 +241,8 @@ ServiceResponse ServiceClient::createRegion(int electionId, const std::string& n
             return createErrorResponse("Failed to create region (name: '" + name + "', code: '" + code + "')");
         }
     } catch (const std::exception& e) {
-        return createErrorResponse("Exception in createRegion: " + std::string(e.what()));
+        std::cerr << "[SERVER ERROR] Exception in createRegion: " << e.what() << std::endl;
+        return createErrorResponse("An internal error occurred while creating the region.");
     }
 }
 
