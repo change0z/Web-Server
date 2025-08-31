@@ -4,7 +4,7 @@
 #include <memory>
 #include <functional>
 
-// Simple test framework (will replace with Google Test later)
+// Simple custom test framework
 class TestRunner {
 private:
     int testsRun = 0;
