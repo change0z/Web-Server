@@ -43,12 +43,14 @@ public:
 class NameValidationTests {
 public:
     static bool testValidNames() {
+        // Generate a valid name with exactly 50 characters (all 'A')
+        const std::string fiftyCharName(50, 'A');
         return InputValidator::isValidName("John") &&
                InputValidator::isValidName("Alice") &&
                InputValidator::isValidName("Bob") &&
                InputValidator::isValidName("MaryJane") &&
                InputValidator::isValidName("An") && // Minimum 2 chars
-               InputValidator::isValidName("VeryLongButValidNameWithExactlyFiftyCharacters");
+               InputValidator::isValidName(fiftyCharName);
     }
     
     static bool testInvalidNames() {
