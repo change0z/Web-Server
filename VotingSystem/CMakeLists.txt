@@ -38,6 +38,12 @@ add_executable(VoterInterface
 )
 target_link_libraries(VoterInterface ElectionLib ClearBallotServiceLib)
 
+# Standalone ClearBallot Service
+add_executable(ClearBallotService
+    applications/service/service_main.cpp
+)
+target_link_libraries(ClearBallotService ElectionLib ClearBallotServiceLib)
+
 # Keep the original for compatibility
 add_executable(VotingSystem
     applications/main.cpp
@@ -61,3 +67,6 @@ add_executable(TestRestrictions
     applications/demos/test_restrictions.cpp
 )
 target_link_libraries(TestRestrictions ElectionLib)
+
+# Include testing directory
+add_subdirectory(tests)

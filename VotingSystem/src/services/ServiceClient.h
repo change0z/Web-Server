@@ -37,6 +37,21 @@ public:
     ServiceResponse createParty(int electionId, const std::string& partyName);
     ServiceResponse getParties(int electionId);
     
+    // Regional operations
+    ServiceResponse createRegion(int electionId, const std::string& name, const std::string& code);
+    ServiceResponse getRegions(int electionId);
+    ServiceResponse addCandidateToRegion(int electionId, const std::string& name, 
+                                       const std::string& regionCode);
+    ServiceResponse addCandidateToRegion(int electionId, const std::string& name,
+                                       const std::string& partyName, const std::string& regionCode);
+    ServiceResponse registerVoterInRegion(int electionId, const std::string& firstName,
+                                        const std::string& lastName, const std::string& phone,
+                                        const std::string& address, const std::string& idStr,
+                                        const std::string& ageStr, const std::string& regionCode);
+    ServiceResponse castVoteInRegion(int electionId, int voterId, int candidateIndex,
+                                   const std::string& regionCode);
+    ServiceResponse getRegionalResults(int electionId, const std::string& regionCode);
+    
     // Data persistence operations
     ServiceResponse saveElectionResults(int electionId, const std::string& filename);
     ServiceResponse saveCompleteElectionData(int electionId, const std::string& filename);
